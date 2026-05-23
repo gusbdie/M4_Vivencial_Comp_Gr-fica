@@ -4,6 +4,7 @@ from PIL import Image
 import numpy as np
 import os
 import random
+from datetime import datetime
 
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
@@ -180,7 +181,7 @@ def draw_sky_background():
 
 def load_texture_from_file(filepath, placeholder_color=(128, 128, 128, 255)):
     if not os.path.exists(filepath):
-        print(f"⚠️  Arquivo não encontrado: {filepath}")
+        print(f"    Arquivo não encontrado: {filepath}")
         print(f"   Criando textura placeholder...")
         
         width, height = 256, 256
@@ -222,10 +223,10 @@ def load_texture_from_file(filepath, placeholder_color=(128, 128, 128, 255)):
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
         
-        print(f"✅ Textura carregada: {filepath} ({width}x{height})")
+        print(f"Textura carregada: {filepath} ({width}x{height})")
         return texture_id
     except Exception as e:
-        print(f"❌ Erro ao carregar {filepath}: {e}")
+        print(f"Erro ao carregar {filepath}: {e}")
         return load_texture_from_file("", placeholder_color)
 
 
@@ -241,28 +242,27 @@ def init_opengl():
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-
 def main():
     if not glfw.init():
-        print("❌ Erro ao inicializar GLFW")
+        print("Erro ao inicializar GLFW")
         return
     
     window = glfw.create_window(
         WINDOW_WIDTH, WINDOW_HEIGHT,
-        "🎮 Platformer Parallax - ⬅️➡️ Mover | ⬆️ Pular",
+        "Platformer Parallax ",
         None, None
     )
     
     if not window:
         glfw.terminate()
-        print("❌ Erro ao criar janela")
+        print("Erro ao criar janela")
         return
     
     glfw.make_context_current(window)
     init_opengl()
     
     print("=" * 60)
-    print("🎨 CARREGANDO TEXTURAS...")
+    print("CARREGANDO TEXTURAS...")
     print("=" * 60)
     
     ground_tex = load_texture_from_file("textures/ground.png", (139, 90, 43, 255))
@@ -288,8 +288,16 @@ def main():
     dragon = Dragon(dragon_tex, 120, 80)
     
     print("▶️  Jogo iniciado! Divirta-se! 🎮")
-    
+    last = datetime.now()
+    now = datetime.now()
     while not glfw.window_should_close(window):
+
+        now = datetime.now()
+        if (now - last).total_seconds() < 1/60:
+            continue
+        last = now
+
+
         glClear(GL_COLOR_BUFFER_BIT)
         
         dx = 0
@@ -326,7 +334,7 @@ def main():
         glfw.poll_events()
     
     glfw.terminate()
-    print("👋 Até logo!")
+    print("Fim de Jogo")
 
 
 if __name__ == "__main__":
